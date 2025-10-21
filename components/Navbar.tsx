@@ -46,7 +46,7 @@ export default function Navbar() {
               Home
             </Box>
           </Link>
-          <Link href="/oc-admin" style={{ textDecoration: 'none' }}>
+          <Link href="/oc-admin/login" style={{ textDecoration: 'none' }}>
             <Button
               size="sm"
               bg="#5294CF"
@@ -84,7 +84,7 @@ export default function Navbar() {
                 Home
               </Box>
             </Link>
-            <Link href="/oc-admin" style={{ textDecoration: 'none' }}>
+            <Link href="/oc-admin/login" style={{ textDecoration: 'none' }}>
               <Button
                 size="sm"
                 bg="#5294CF"

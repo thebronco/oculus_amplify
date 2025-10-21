@@ -9,9 +9,9 @@ const backend = defineBackend({
 });
 
 // Add permissions for unauthenticated users to read existing DynamoDB tables
-const { unauthenticatedUserIamRole } = backend.auth.resources;
+const { unauthenticatedUserIamRole, authenticatedUserIamRole } = backend.auth.resources;
 
-const dynamoDBReadPolicy = new Policy(backend.auth.resources.authenticatedUserIamRole.stack, 'ExistingDynamoDBReadPolicy', {
+const dynamoDBReadPolicy = new Policy(unauthenticatedUserIamRole.stack, 'ExistingDynamoDBReadPolicy', {
   statements: [
     new PolicyStatement({
       effect: Effect.ALLOW,
@@ -30,3 +30,27 @@ const dynamoDBReadPolicy = new Policy(backend.auth.resources.authenticatedUserIa
 });
 
 unauthenticatedUserIamRole.attachInlinePolicy(dynamoDBReadPolicy);
+
+// Add full CRUD permissions for authenticated users (admin)
+const dynamoDBWritePolicy = new Policy(authenticatedUserIamRole.stack, 'ExistingDynamoDBWritePolicy', {
+  statements: [
+    new PolicyStatement({
+      effect: Effect.ALLOW,
+      actions: [
+        'dynamodb:GetItem',
+        'dynamodb:Query',
+        'dynamodb:Scan',
+        'dynamodb:PutItem',
+        'dynamodb:UpdateItem',
+        'dynamodb:DeleteItem',
+      ],
+      resources: [
+        'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-categories-amplify',
+        'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-articles-amplify',
+        'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-users-amplify',
+      ],
+    })
+  ],
+});
+
+authenticatedUserIamRole.attachInlinePolicy(dynamoDBWritePolicy);

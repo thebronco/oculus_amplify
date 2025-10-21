@@ -141,3 +141,53 @@ export async function getArticlesByCategoryId(categoryId: string): Promise<Artic
   }
 }
 
+// Fetch a single category by slug
+export async function getCategoryBySlug(slug: string): Promise<Category | null> {
+  try {
+    const client = await getDynamoDBClient();
+    
+    const command = new ScanCommand({
+      TableName: TABLES.CATEGORIES,
+      FilterExpression: 'slug = :slug',
+      ExpressionAttributeValues: {
+        ':slug': slug,
+      },
+    });
+
+    const response = await client.send(command);
+    const items = (response.Items || []) as Category[];
+    return items.length > 0 ? items[0] : null;
+  } catch (error) {
+    console.error('Error fetching category by slug:', error);
+    throw error;
+  }
+}
+
+// Fetch subcategories (alias for better readability)
+export async function getSubcategories(parentId: string): Promise<Category[]> {
+  return getCategoriesByParentId(parentId);
+}
+
+// Fetch a single article by slug and categoryId
+export async function getArticleBySlug(slug: string, categoryId: string): Promise<Article | null> {
+  try {
+    const client = await getDynamoDBClient();
+    
+    const command = new ScanCommand({
+      TableName: TABLES.ARTICLES,
+      FilterExpression: 'slug = :slug AND categoryId = :categoryId',
+      ExpressionAttributeValues: {
+        ':slug': slug,
+        ':categoryId': categoryId,
+      },
+    });
+
+    const response = await client.send(command);
+    const items = (response.Items || []) as Article[];
+    return items.length > 0 ? items[0] : null;
+  } catch (error) {
+    console.error('Error fetching article by slug:', error);
+    throw error;
+  }
+}
+
