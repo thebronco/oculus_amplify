@@ -7,10 +7,18 @@ We do NOT create tables via Amplify Data models.
 - Articles: oc-dynamodb-articles-amplify (existing table)
 - Users: oc-dynamodb-users-amplify (existing table)
 Access is managed via IAM policies in amplify/backend.ts
+
+This Todo model is a dummy placeholder required by Amplify.
+It is NOT used in the application.
 =========================================================================*/
 
-// Empty schema - we use existing DynamoDB tables directly
-const schema = a.schema({});
+const schema = a.schema({
+  Todo: a
+    .model({
+      content: a.string(),
+    })
+    .authorization((allow) => [allow.publicApiKey()]),
+});
 
 export type Schema = ClientSchema<typeof schema>;
 
