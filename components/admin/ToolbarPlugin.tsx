@@ -23,6 +23,7 @@ import {
   INSERT_UNORDERED_LIST_COMMAND,
   REMOVE_LIST_COMMAND,
   $isListNode,
+  ListNode,
 } from '@lexical/list';
 import { $setBlocksType } from '@lexical/selection';
 import { $getNearestNodeOfType } from '@lexical/utils';
