@@ -269,3 +269,34 @@ export async function deleteArticle(id: string): Promise<void> {
   }
 }
 
+// ===== USERS =====
+
+export async function getUsers(): Promise<any[]> {
+  try {
+    const client = await getDynamoDBClient();
+    const command = new ScanCommand({
+      TableName: TABLES.USERS,
+    });
+    const response = await client.send(command);
+    return (response.Items || []) as any[];
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    throw error;
+  }
+}
+
+export async function getUserById(id: string): Promise<any | null> {
+  try {
+    const client = await getDynamoDBClient();
+    const command = new GetCommand({
+      TableName: TABLES.USERS,
+      Key: { id },
+    });
+    const response = await client.send(command);
+    return response.Item || null;
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    throw error;
+  }
+}
+

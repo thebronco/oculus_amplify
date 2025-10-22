@@ -5,6 +5,7 @@
 /.pnp
 .pnp.js
 .yarn/install-state.gz
+/ignore_oc_admin
 
 # testing
 /coverage

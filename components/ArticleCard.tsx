@@ -50,7 +50,7 @@ export default function ArticleCard({ article, basePath }: ArticleCardProps) {
     : '';
 
   return (
-    <Link href={href} style={{ textDecoration: 'none' }}>
+    <Link href={href} style={{ textDecoration: 'none', height: '100%' }}>
       <Card 
         bg="#161d26"
         border="1px solid"
@@ -64,40 +64,44 @@ export default function ArticleCard({ article, basePath }: ArticleCardProps) {
         }}
         cursor="pointer"
         transition="all 0.2s"
-        minH="120px"
+        h="100%"
+        minH="200px"
+        maxH="200px"
       >
-        <CardBody p={4}>
-          <VStack align="start" spacing={2}>
-            <Heading 
-              size="md" 
-              color="#5294CF" 
-              fontWeight="600"
-              noOfLines={2}
-            >
-              {article.title}
-            </Heading>
-            
-            <HStack spacing={3} fontSize="xs" color="gray.400">
+        <CardBody p={4} h="100%" display="flex" flexDirection="column">
+          <VStack align="start" spacing={2} h="100%" justify="space-between">
+            <Box w="100%">
+              <Heading 
+                size="md" 
+                color="#5294CF" 
+                fontWeight="600"
+                noOfLines={2}
+                mb={2}
+              >
+                {article.title}
+              </Heading>
+              
+              {article.content && (
+                <Text 
+                  fontSize="sm" 
+                  color="#D5DBDB" 
+                  lineHeight="1.5"
+                  noOfLines={3}
+                >
+                  {extractTextPreview(article.content)}
+                </Text>
+              )}
+            </Box>
+
+            <HStack spacing={3} fontSize="xs" color="gray.400" mt="auto">
               {article.author && (
                 <>
-                  <Text>By {article.author}</Text>
+                  <Text noOfLines={1}>By {article.author}</Text>
                   {formattedDate && <Text>•</Text>}
                 </>
               )}
               {formattedDate && <Text>{formattedDate}</Text>}
             </HStack>
-
-            {article.content && (
-              <Text 
-                fontSize="sm" 
-                color="#D5DBDB" 
-                lineHeight="1.5"
-                noOfLines={2}
-              >
-                {/* Extract plain text preview from Lexical JSON content */}
-                {extractTextPreview(article.content)}
-              </Text>
-            )}
           </VStack>
         </CardBody>
       </Card>

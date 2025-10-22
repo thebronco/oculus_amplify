@@ -287,7 +287,11 @@ export default function DynamicPage() {
               <Heading size="md" color="#5294CF" mb={4}>
                 Articles
               </Heading>
-              <SimpleGrid columns={{ base: 1, md: 2 }} gap={4}>
+              <SimpleGrid 
+                columns={{ base: 1, md: 2 }} 
+                gap={4}
+                alignItems="stretch"
+              >
                 {articles.map(article => (
                   <ArticleCard
                     key={article.id}

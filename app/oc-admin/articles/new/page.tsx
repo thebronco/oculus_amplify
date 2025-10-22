@@ -15,12 +15,12 @@ import {
   FormHelperText,
   Switch,
   Text,
-  Textarea,
   useToast,
   Spinner,
 } from '@chakra-ui/react';
 import AuthGuard from '@/components/admin/AuthGuard';
 import AdminLayout from '@/components/admin/AdminLayout';
+import LexicalEditor from '@/components/admin/LexicalEditor';
 import { getCategories, createArticle } from '@/lib/api';
 import type { Category } from '@/lib/types';
 
@@ -251,61 +251,12 @@ function NewArticleForm() {
                 {/* Content */}
                 <FormControl isRequired>
                   <FormLabel color="white">Content</FormLabel>
-                  <Textarea
-                    value={(() => {
-                      try {
-                        const parsed = JSON.parse(formData.content);
-                        // Extract text from Lexical JSON
-                        const text = parsed.root?.children?.[0]?.children?.[0]?.text || '';
-                        return text;
-                      } catch {
-                        return formData.content;
-                      }
-                    })()}
-                    onChange={(e) => {
-                      const text = e.target.value;
-                      const lexicalContent = {
-                        root: {
-                          children: [
-                            {
-                              children: [
-                                {
-                                  detail: 0,
-                                  format: 0,
-                                  mode: "normal",
-                                  style: "",
-                                  text: text,
-                                  type: "text",
-                                  version: 1
-                                }
-                              ],
-                              direction: "ltr",
-                              format: "",
-                              indent: 0,
-                              type: "paragraph",
-                              version: 1
-                            }
-                          ],
-                          direction: "ltr",
-                          format: "",
-                          indent: 0,
-                          type: "root",
-                          version: 1
-                        }
-                      };
-                      handleChange('content', JSON.stringify(lexicalContent));
-                    }}
-                    placeholder="Write your article content here..."
-                    bg="whiteAlpha.100"
-                    border="1px solid"
-                    borderColor="whiteAlpha.300"
-                    color="white"
-                    _placeholder={{ color: 'gray.500' }}
-                    rows={15}
-                    fontFamily="inherit"
+                  <LexicalEditor
+                    initialContent={formData.content}
+                    onChange={(content) => handleChange('content', content)}
                   />
                   <FormHelperText color="gray.500">
-                    Simple text editor. Formatting will be preserved in Lexical JSON format.
+                    Rich text editor with formatting support (bold, italic, headings, lists, etc.)
                   </FormHelperText>
                 </FormControl>
 
