@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import {
   Box,
@@ -24,7 +24,7 @@ import AdminLayout from '@/components/admin/AdminLayout';
 import { getCategories, getArticleById, updateArticle } from '@/lib/api';
 import type { Category, Article } from '@/lib/types';
 
-export default function EditArticlePage() {
+function EditArticleForm() {
   const router = useRouter();
   const params = useParams();
   const toast = useToast();
@@ -358,6 +358,18 @@ export default function EditArticlePage() {
         </Box>
       </AdminLayout>
     </AuthGuard>
+  );
+}
+
+export default function EditArticlePage() {
+  return (
+    <Suspense fallback={
+      <Box minH="100vh" bg="#0f1419" display="flex" alignItems="center" justifyContent="center">
+        <Spinner size="xl" color="#5294CF" />
+      </Box>
+    }>
+      <EditArticleForm />
+    </Suspense>
   );
 }
 

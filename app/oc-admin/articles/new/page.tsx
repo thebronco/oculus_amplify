@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Box,
@@ -17,13 +17,14 @@ import {
   Text,
   Textarea,
   useToast,
+  Spinner,
 } from '@chakra-ui/react';
 import AuthGuard from '@/components/admin/AuthGuard';
 import AdminLayout from '@/components/admin/AdminLayout';
 import { getCategories, createArticle } from '@/lib/api';
 import type { Category } from '@/lib/types';
 
-export default function NewArticlePage() {
+function NewArticleForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const toast = useToast();
@@ -360,6 +361,18 @@ export default function NewArticlePage() {
         </Box>
       </AdminLayout>
     </AuthGuard>
+  );
+}
+
+export default function NewArticlePage() {
+  return (
+    <Suspense fallback={
+      <Box minH="100vh" bg="#0f1419" display="flex" alignItems="center" justifyContent="center">
+        <Spinner size="xl" color="#5294CF" />
+      </Box>
+    }>
+      <NewArticleForm />
+    </Suspense>
   );
 }
 
