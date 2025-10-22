@@ -64,7 +64,11 @@ export default function LoginPage() {
               // Check if logged-in user is admin
               if (user?.signInDetails?.loginId === ADMIN_EMAIL) {
                 router.push('/oc-admin/dashboard');
-                return null;
+                return (
+                  <VStack spacing={4} color="white">
+                    <Text>Redirecting to dashboard...</Text>
+                  </VStack>
+                );
               }
               
               // Not admin - show error
