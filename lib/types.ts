@@ -36,3 +36,19 @@ export interface User {
   updatedAt: string;
 }
 
+export interface Vulnerability {
+  cveID: string;
+  vendorname: string;
+  vendorproduct: string;
+  vulnerabilityName: string;
+  dateAdded: string;
+  shortDescription: string;
+  requiredAction: string;
+  dueDate: string;
+  knownRansomwareCampaignUse: string;
+  notes?: string;
+  cwes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+

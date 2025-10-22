@@ -11,7 +11,7 @@ const backend = defineBackend({
 // Add permissions for unauthenticated users to read existing DynamoDB tables
 const { unauthenticatedUserIamRole, authenticatedUserIamRole } = backend.auth.resources;
 
-const dynamoDBReadPolicy = new Policy(unauthenticatedUserIamRole.stack, 'ExistingDynamoDBReadPolicy', {
+const dynamoDBReadPolicy = new Policy(backend.data.resources.cfnResources.cfnGraphqlApi.stack, 'ExistingDynamoDBReadPolicy', {
   statements: [
     new PolicyStatement({
       effect: Effect.ALLOW,
@@ -24,6 +24,7 @@ const dynamoDBReadPolicy = new Policy(unauthenticatedUserIamRole.stack, 'Existin
         'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-categories-amplify',
         'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-articles-amplify',
         'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-users-amplify',
+        'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-vulnerabilities-amplify',
       ],
     })
   ],
@@ -32,7 +33,7 @@ const dynamoDBReadPolicy = new Policy(unauthenticatedUserIamRole.stack, 'Existin
 unauthenticatedUserIamRole.attachInlinePolicy(dynamoDBReadPolicy);
 
 // Add full CRUD permissions for authenticated users (admin)
-const dynamoDBWritePolicy = new Policy(authenticatedUserIamRole.stack, 'ExistingDynamoDBWritePolicy', {
+const dynamoDBWritePolicy = new Policy(backend.data.resources.cfnResources.cfnGraphqlApi.stack, 'ExistingDynamoDBWritePolicy', {
   statements: [
     new PolicyStatement({
       effect: Effect.ALLOW,
@@ -48,6 +49,7 @@ const dynamoDBWritePolicy = new Policy(authenticatedUserIamRole.stack, 'Existing
         'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-categories-amplify',
         'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-articles-amplify',
         'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-users-amplify',
+        'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-vulnerabilities-amplify',
       ],
     })
   ],

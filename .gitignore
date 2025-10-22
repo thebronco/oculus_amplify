@@ -9,6 +9,8 @@
 
 # testing
 /coverage
+/vuln_data
+vuln_data
 
 # next.js
 /.next/

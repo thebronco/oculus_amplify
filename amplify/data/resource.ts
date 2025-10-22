@@ -6,16 +6,20 @@ We do NOT create tables via Amplify Data models.
 - Categories: oc-dynamodb-categories-amplify (existing table)
 - Articles: oc-dynamodb-articles-amplify (existing table)
 - Users: oc-dynamodb-users-amplify (existing table)
+- Vulnerabilities: oc-dynamodb-vulnerabilities-amplify (existing table)
 Access is managed via IAM policies in amplify/backend.ts
 
-This Todo model is a dummy placeholder required by Amplify.
-It is NOT used in the application.
+This schema contains a minimal placeholder model required by Amplify Gen 2.
+The actual data is stored in existing DynamoDB tables accessed via AWS SDK.
 =========================================================================*/
 
 const schema = a.schema({
-  Todo: a
+  // Minimal placeholder model required by Amplify Gen 2
+  // This project uses existing DynamoDB tables directly via AWS SDK
+  // All data access is handled through IAM policies in amplify/backend.ts
+  Placeholder: a
     .model({
-      content: a.string(),
+      id: a.id().required(),
     })
     .authorization((allow) => [allow.publicApiKey()]),
 });
