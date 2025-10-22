@@ -1,32 +1,28 @@
 // API functions for DynamoDB CRUD operations
-import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
-import { 
-  DynamoDBDocumentClient, 
-  ScanCommand, 
-  GetCommand, 
-  PutCommand,
-  UpdateCommand,
-  DeleteCommand,
-} from '@aws-sdk/lib-dynamodb';
 import { fetchAuthSession } from 'aws-amplify/auth';
-import type { Category, Article } from './types';
+import type { Category, Article, Vulnerability } from './types';
+
+const REGION = 'us-east-1';
 
 const TABLES = {
   CATEGORIES: 'oc-dynamodb-categories-amplify',
   ARTICLES: 'oc-dynamodb-articles-amplify',
   USERS: 'oc-dynamodb-users-amplify',
+  VULNERABILITIES: 'oc-dynamodb-vulnerabilities-amplify',
 };
 
-const REGION = 'us-east-1';
-
 // Get DynamoDB client with current auth session
-async function getDynamoDBClient(): Promise<DynamoDBDocumentClient> {
+async function getDynamoDBClient() {
   const session = await fetchAuthSession();
   const credentials = session.credentials;
 
   if (!credentials) {
     throw new Error('No credentials available');
   }
+
+  // Dynamic imports to avoid bundling issues
+  const { DynamoDBClient } = await import('@aws-sdk/client-dynamodb');
+  const { DynamoDBDocumentClient } = await import('@aws-sdk/lib-dynamodb');
 
   const client = new DynamoDBClient({
     region: REGION,
@@ -40,11 +36,18 @@ async function getDynamoDBClient(): Promise<DynamoDBDocumentClient> {
   return DynamoDBDocumentClient.from(client);
 }
 
+// Helper function to get DynamoDB commands
+async function getDynamoDBCommands() {
+  const { ScanCommand, GetCommand, PutCommand, UpdateCommand, DeleteCommand } = await import('@aws-sdk/lib-dynamodb');
+  return { ScanCommand, GetCommand, PutCommand, UpdateCommand, DeleteCommand };
+}
+
 // ===== CATEGORIES =====
 
 export async function getCategories(): Promise<Category[]> {
   try {
     const client = await getDynamoDBClient();
+    const { ScanCommand } = await getDynamoDBCommands();
     const command = new ScanCommand({
       TableName: TABLES.CATEGORIES,
     });
@@ -59,6 +62,7 @@ export async function getCategories(): Promise<Category[]> {
 export async function getCategoryById(id: string): Promise<Category | null> {
   try {
     const client = await getDynamoDBClient();
+    const { GetCommand } = await getDynamoDBCommands();
     const command = new GetCommand({
       TableName: TABLES.CATEGORIES,
       Key: { id },
@@ -84,6 +88,7 @@ export async function createCategory(data: Omit<Category, 'id' | 'createdAt' | '
       updatedAt: now,
     };
 
+    const { PutCommand } = await getDynamoDBCommands();
     const command = new PutCommand({
       TableName: TABLES.CATEGORIES,
       Item: category,
@@ -119,6 +124,7 @@ export async function updateCategory(id: string, data: Partial<Category>): Promi
     expressionAttributeNames['#updatedAt'] = 'updatedAt';
     expressionAttributeValues[':updatedAt'] = now;
 
+    const { UpdateCommand } = await getDynamoDBCommands();
     const command = new UpdateCommand({
       TableName: TABLES.CATEGORIES,
       Key: { id },
@@ -139,6 +145,7 @@ export async function updateCategory(id: string, data: Partial<Category>): Promi
 export async function deleteCategory(id: string): Promise<void> {
   try {
     const client = await getDynamoDBClient();
+    const { DeleteCommand } = await getDynamoDBCommands();
     const command = new DeleteCommand({
       TableName: TABLES.CATEGORIES,
       Key: { id },
@@ -164,6 +171,7 @@ export async function toggleCategoryVisibility(id: string, isVisible: boolean): 
 export async function getArticles(): Promise<Article[]> {
   try {
     const client = await getDynamoDBClient();
+    const { ScanCommand } = await getDynamoDBCommands();
     const command = new ScanCommand({
       TableName: TABLES.ARTICLES,
     });
@@ -178,6 +186,7 @@ export async function getArticles(): Promise<Article[]> {
 export async function getArticleById(id: string): Promise<Article | null> {
   try {
     const client = await getDynamoDBClient();
+    const { GetCommand } = await getDynamoDBCommands();
     const command = new GetCommand({
       TableName: TABLES.ARTICLES,
       Key: { id },
@@ -203,6 +212,7 @@ export async function createArticle(data: Omit<Article, 'id' | 'createdAt' | 'up
       updatedAt: now,
     };
 
+    const { PutCommand } = await getDynamoDBCommands();
     const command = new PutCommand({
       TableName: TABLES.ARTICLES,
       Item: article,
@@ -238,6 +248,7 @@ export async function updateArticle(id: string, data: Partial<Article>): Promise
     expressionAttributeNames['#updatedAt'] = 'updatedAt';
     expressionAttributeValues[':updatedAt'] = now;
 
+    const { UpdateCommand } = await getDynamoDBCommands();
     const command = new UpdateCommand({
       TableName: TABLES.ARTICLES,
       Key: { id },
@@ -258,6 +269,7 @@ export async function updateArticle(id: string, data: Partial<Article>): Promise
 export async function deleteArticle(id: string): Promise<void> {
   try {
     const client = await getDynamoDBClient();
+    const { DeleteCommand } = await getDynamoDBCommands();
     const command = new DeleteCommand({
       TableName: TABLES.ARTICLES,
       Key: { id },
@@ -274,6 +286,7 @@ export async function deleteArticle(id: string): Promise<void> {
 export async function getUsers(): Promise<any[]> {
   try {
     const client = await getDynamoDBClient();
+    const { ScanCommand } = await getDynamoDBCommands();
     const command = new ScanCommand({
       TableName: TABLES.USERS,
     });
@@ -288,6 +301,7 @@ export async function getUsers(): Promise<any[]> {
 export async function getUserById(id: string): Promise<any | null> {
   try {
     const client = await getDynamoDBClient();
+    const { GetCommand } = await getDynamoDBCommands();
     const command = new GetCommand({
       TableName: TABLES.USERS,
       Key: { id },
@@ -296,6 +310,182 @@ export async function getUserById(id: string): Promise<any | null> {
     return response.Item || null;
   } catch (error) {
     console.error('Error fetching user:', error);
+    throw error;
+  }
+}
+
+// ===== VULNERABILITIES =====
+
+export interface VulnerabilityFilters {
+  cveId?: string;
+  vendor?: string;
+  dateFrom?: string;
+  dateTo?: string;
+  ransomwareCampaign?: string;
+  limit?: number;
+  lastEvaluatedKey?: any;
+}
+
+export async function getVulnerabilities(filters: VulnerabilityFilters = {}): Promise<{
+  items: Vulnerability[];
+  lastEvaluatedKey?: any;
+  count: number;
+}> {
+  try {
+    const client = await getDynamoDBClient();
+    
+    // Build filter expression (excluding vendor for client-side filtering)
+    const filterExpressions: string[] = [];
+    const expressionAttributeNames: Record<string, string> = {};
+    const expressionAttributeValues: Record<string, any> = {};
+    
+    if (filters.cveId) {
+      filterExpressions.push('contains(cveID, :cveId)');
+      expressionAttributeValues[':cveId'] = filters.cveId;
+    }
+    
+    // Note: Vendor filtering is done client-side for case-insensitive search
+    // if (filters.vendor) {
+    //   filterExpressions.push('contains(vendorname, :vendor)');
+    //   expressionAttributeValues[':vendor'] = filters.vendor;
+    // }
+    
+    if (filters.dateFrom) {
+      filterExpressions.push('dateAdded >= :dateFrom');
+      expressionAttributeValues[':dateFrom'] = filters.dateFrom;
+    }
+    
+    if (filters.dateTo) {
+      filterExpressions.push('dateAdded <= :dateTo');
+      expressionAttributeValues[':dateTo'] = filters.dateTo;
+    }
+    
+    if (filters.ransomwareCampaign) {
+      filterExpressions.push('contains(knownRansomwareCampaignUse, :ransomwareCampaign)');
+      expressionAttributeValues[':ransomwareCampaign'] = filters.ransomwareCampaign;
+    }
+    
+    const { ScanCommand } = await getDynamoDBCommands();
+    const command = new ScanCommand({
+      TableName: TABLES.VULNERABILITIES,
+      FilterExpression: filterExpressions.length > 0 ? filterExpressions.join(' AND ') : undefined,
+      ExpressionAttributeNames: Object.keys(expressionAttributeNames).length > 0 ? expressionAttributeNames : undefined,
+      ExpressionAttributeValues: Object.keys(expressionAttributeValues).length > 0 ? expressionAttributeValues : undefined,
+      Limit: filters.limit || 50,
+      ExclusiveStartKey: filters.lastEvaluatedKey,
+    });
+    
+    const response = await client.send(command);
+    let items = (response.Items || []) as Vulnerability[];
+    
+    // Apply client-side vendor filtering for case-insensitive search
+    if (filters.vendor) {
+      const vendorLower = filters.vendor.toLowerCase();
+      items = items.filter(item => 
+        item.vendorname?.toLowerCase().includes(vendorLower) ||
+        item.vendorproduct?.toLowerCase().includes(vendorLower)
+      );
+    }
+    
+    return {
+      items,
+      lastEvaluatedKey: response.LastEvaluatedKey,
+      count: response.Count || 0,
+    };
+  } catch (error) {
+    console.error('Error fetching vulnerabilities:', error);
+    throw error;
+  }
+}
+
+export async function getVulnerabilityById(cveId: string): Promise<Vulnerability | null> {
+  try {
+    const client = await getDynamoDBClient();
+    const { GetCommand } = await getDynamoDBCommands();
+    const command = new GetCommand({
+      TableName: TABLES.VULNERABILITIES,
+      Key: { cveID: cveId },
+    });
+    const response = await client.send(command);
+    return response.Item as Vulnerability || null;
+  } catch (error) {
+    console.error('Error fetching vulnerability:', error);
+    throw error;
+  }
+}
+
+export async function getVulnerabilitiesTotalCount(filters: VulnerabilityFilters = {}): Promise<number> {
+  try {
+    const client = await getDynamoDBClient();
+    
+    // Build filter expression (excluding vendor for client-side filtering)
+    const filterExpressions: string[] = [];
+    const expressionAttributeNames: Record<string, string> = {};
+    const expressionAttributeValues: Record<string, any> = {};
+    
+    if (filters.cveId) {
+      filterExpressions.push('contains(cveID, :cveId)');
+      expressionAttributeValues[':cveId'] = filters.cveId;
+    }
+    
+    // Note: Vendor filtering is done client-side for case-insensitive search
+    // if (filters.vendor) {
+    //   filterExpressions.push('contains(vendorname, :vendor)');
+    //   expressionAttributeValues[':vendor'] = filters.vendor;
+    // }
+    
+    if (filters.dateFrom) {
+      filterExpressions.push('dateAdded >= :dateFrom');
+      expressionAttributeValues[':dateFrom'] = filters.dateFrom;
+    }
+    
+    if (filters.dateTo) {
+      filterExpressions.push('dateAdded <= :dateTo');
+      expressionAttributeValues[':dateTo'] = filters.dateTo;
+    }
+    
+    if (filters.ransomwareCampaign) {
+      filterExpressions.push('contains(knownRansomwareCampaignUse, :ransomwareCampaign)');
+      expressionAttributeValues[':ransomwareCampaign'] = filters.ransomwareCampaign;
+    }
+    
+    // If vendor filter is applied, we need to fetch all items and filter client-side
+    if (filters.vendor) {
+      const { ScanCommand } = await getDynamoDBCommands();
+    const command = new ScanCommand({
+        TableName: TABLES.VULNERABILITIES,
+        FilterExpression: filterExpressions.length > 0 ? filterExpressions.join(' AND ') : undefined,
+        ExpressionAttributeNames: Object.keys(expressionAttributeNames).length > 0 ? expressionAttributeNames : undefined,
+        ExpressionAttributeValues: Object.keys(expressionAttributeValues).length > 0 ? expressionAttributeValues : undefined,
+      });
+      
+      const response = await client.send(command);
+      const items = (response.Items || []) as Vulnerability[];
+      
+      // Apply client-side vendor filtering for case-insensitive search
+      const vendorLower = filters.vendor.toLowerCase();
+      const filteredItems = items.filter(item => 
+        item.vendorname?.toLowerCase().includes(vendorLower) ||
+        item.vendorproduct?.toLowerCase().includes(vendorLower)
+      );
+      
+      return filteredItems.length;
+    } else {
+      // Use ScanCommand with Select: 'COUNT' to get total count
+      const { ScanCommand } = await getDynamoDBCommands();
+    const command = new ScanCommand({
+        TableName: TABLES.VULNERABILITIES,
+        FilterExpression: filterExpressions.length > 0 ? filterExpressions.join(' AND ') : undefined,
+        ExpressionAttributeNames: Object.keys(expressionAttributeNames).length > 0 ? expressionAttributeNames : undefined,
+        ExpressionAttributeValues: Object.keys(expressionAttributeValues).length > 0 ? expressionAttributeValues : undefined,
+        Select: 'COUNT',
+      });
+      
+      const response = await client.send(command);
+      return response.Count || 0;
+    }
+  } catch (error) {
+    console.error('Error fetching vulnerabilities total count:', error);
     throw error;
   }
 }

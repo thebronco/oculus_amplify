@@ -165,27 +165,27 @@ export default function HomePage() {
               {/* Bottom Tutorial Cards */}
               <SimpleGrid columns={{ base: 1, sm: 2, md: 2, lg: 4 }} gap={{ base: 4, md: 6 }} mt={6}>
                 {[
-                  { title: 'Hands-on Tutorials', subtitle: 'Get started with step-by-step tutorials to launch your first security assessment', icon: '🎯', color: '#4ECDC4' },
-                  { title: 'Security Best Practices', subtitle: 'Resources to help you accelerate threat detection and incident response', icon: '✅', color: '#45B7D1' },
-                  { title: 'Compliance Center', subtitle: 'Learn how to architect more effectively for regulatory compliance', icon: '📊', color: '#96CEB4' },
-                  { title: 'Threat Intelligence', subtitle: 'Find vetted threat indicators and guidance for proactive defense', icon: '🔍', color: '#FFEAA7' }
+                  { title: 'Hands-on Tutorials', subtitle: 'Get started with step-by-step tutorials to launch your first security assessment', icon: '🎯', color: '#4ECDC4', href: '#' },
+                  { title: 'Security Best Practices', subtitle: 'Resources to help you accelerate threat detection and incident response', icon: '✅', color: '#45B7D1', href: '#' },
+                  { title: 'Compliance Center', subtitle: 'Learn how to architect more effectively for regulatory compliance', icon: '📊', color: '#96CEB4', href: '#' },
+                  { title: 'Threat Intelligence', subtitle: 'Find vetted threat indicators and guidance for proactive defense', icon: '🔍', color: '#FFEAA7', href: '/threat-intelligence' }
                 ].map((item, index) => (
-                  <Card 
-                    key={index}
-                    bg="#37475A"
-                    border="1px solid"
-                    borderColor="#4A5F7A"
-                    _hover={{ 
-                      bg: '#3E5266',
-                      borderColor: '#5A6F8A',
-                      transform: 'translateY(-2px)',
-                      transition: 'all 0.2s'
-                    }}
-                    cursor="pointer"
-                    h="200px"
-                    minH="200px"
-                    maxH="200px"
-                  >
+                  <Link key={index} href={item.href} style={{ textDecoration: 'none' }}>
+                    <Card 
+                      bg="#37475A"
+                      border="1px solid"
+                      borderColor="#4A5F7A"
+                      _hover={{ 
+                        bg: '#3E5266',
+                        borderColor: '#5A6F8A',
+                        transform: 'translateY(-2px)',
+                        transition: 'all 0.2s'
+                      }}
+                      cursor="pointer"
+                      h="200px"
+                      minH="200px"
+                      maxH="200px"
+                    >
                     <CardBody p={5}>
                       <VStack align="start" spacing={4} h="full">
                         <Box
@@ -226,7 +226,8 @@ export default function HomePage() {
                         </VStack>
                       </VStack>
                     </CardBody>
-                  </Card>
+                    </Card>
+                  </Link>
                 ))}
               </SimpleGrid>
             </Box>
