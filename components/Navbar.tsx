@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Flex, Heading, Button, HStack, IconButton, useDisclosure } from '@chakra-ui/react';
+import { Box, Flex, Heading, Button, HStack, IconButton, useDisclosure, Image } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
 import Link from 'next/link';
 
@@ -21,15 +21,22 @@ export default function Navbar() {
     >
       <Flex maxW="1400px" mx="auto" align="center" justify="space-between">
         <Link href="/" style={{ textDecoration: 'none' }}>
-          <Heading 
-            size={{ base: 'md', md: 'lg' }} 
-            color="#5294CF"
-            cursor="pointer"
-            _hover={{ color: '#74B9FF' }}
-            transition="color 0.2s"
-          >
-            🔒 OculusCyber
-          </Heading>
+          <HStack spacing={3} cursor="pointer">
+            <Image 
+              src="/oculuscyberlogo.png" 
+              alt="OculusCyber Logo" 
+              height={{ base: '40px', md: '48px' }}
+              width="auto"
+            />
+            <Heading 
+              size={{ base: 'md', md: 'lg' }} 
+              color="#5294CF"
+              _hover={{ color: '#74B9FF' }}
+              transition="color 0.2s"
+            >
+              OculusCyber
+            </Heading>
+          </HStack>
         </Link>
 
         {/* Desktop Navigation */}
