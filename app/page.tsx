@@ -165,9 +165,9 @@ export default function HomePage() {
               {/* Bottom Tutorial Cards */}
               <SimpleGrid columns={{ base: 1, sm: 2, md: 2, lg: 4 }} gap={{ base: 4, md: 6 }} mt={6}>
                 {[
-                  { title: 'Hands-on Tutorials', subtitle: 'Get started with step-by-step tutorials to launch your first security assessment', icon: '🎯', color: '#4ECDC4', href: '#' },
-                  { title: 'Security Best Practices', subtitle: 'Resources to help you accelerate threat detection and incident response', icon: '✅', color: '#45B7D1', href: '#' },
-                  { title: 'Compliance Center', subtitle: 'Learn how to architect more effectively for regulatory compliance', icon: '📊', color: '#96CEB4', href: '#' },
+                  { title: 'AI Security Frameworks', subtitle: 'Comprehensive AI security guidelines and controls from leading frameworks', icon: '🤖', color: '#4ECDC4', href: '/ai-security-frameworks' },
+                  { title: 'Security Best Practices', subtitle: 'Resources to help you accelerate threat detection and incident response', icon: '✅', color: '#45B7D1', href: '/security-best-practices' },
+                  { title: 'Compliance Checklist', subtitle: 'Security Compliance Management', icon: '📊', color: '#96CEB4', href: '/compliance' },
                   { title: 'Threat Intelligence', subtitle: 'Find vetted threat indicators and guidance for proactive defense', icon: '🔍', color: '#FFEAA7', href: '/threat-intelligence' }
                 ].map((item, index) => (
                   <Link key={index} href={item.href} style={{ textDecoration: 'none' }}>

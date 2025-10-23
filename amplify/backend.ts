@@ -25,7 +25,10 @@ const dynamoDBReadPolicy = new Policy(backend.data.resources.cfnResources.cfnGra
         'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-articles-amplify',
         'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-users-amplify',
         'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-vulnerabilities-amplify',
-      ],
+        'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-compliance-amplify',
+            'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-best-practices-amplify',
+            'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-ai-security-amplify',
+          ],
     })
   ],
 });
@@ -50,7 +53,10 @@ const dynamoDBWritePolicy = new Policy(backend.data.resources.cfnResources.cfnGr
         'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-articles-amplify',
         'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-users-amplify',
         'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-vulnerabilities-amplify',
-      ],
+        'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-compliance-amplify',
+            'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-best-practices-amplify',
+            'arn:aws:dynamodb:us-east-1:*:table/oc-dynamodb-ai-security-amplify',
+          ],
     })
   ],
 });

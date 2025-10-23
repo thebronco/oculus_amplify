@@ -280,62 +280,40 @@ export default function ThreatIntelligencePage() {
       <Navbar />
       <Box px={{ base: 4, md: 8 }} py={{ base: 4, md: 6 }}>
         <VStack spacing={6} align="stretch" maxW="1400px" mx="auto">
-          {/* Header */}
-          <Box>
-            <HStack mb={2}>
-              <Box
-                bg="#FFEAA7"
-                p={3}
-                borderRadius="md"
-                width="60px"
-                height="60px"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                fontSize="32px"
-              >
-                🔍
-              </Box>
-              <VStack align="start" spacing={1}>
-                <Heading size="xl" color="white">
-                  Threat Intelligence
-                </Heading>
-                <Text color="#D5DBDB" fontSize="lg">
-                  CISA Known Exploitable Vulnerabilities
-                </Text>
-              </VStack>
-            </HStack>
-            <Text color="#A0AEC0" fontSize="sm">
-              Find vetted threat indicators and guidance for proactive defense
-            </Text>
-          </Box>
-
-          {/* Filters */}
-          <Box
-            bg="rgba(255,255,255,0.05)"
-            borderRadius="lg"
-            p={4}
-            border="1px solid"
-            borderColor="whiteAlpha.200"
-          >
-            <HStack mb={4}>
-              <Icon as={FiFilter} color="#5294CF" />
-              <Text color="white" fontWeight="600">
-                Filters
+          {/* Header with Filters */}
+          <HStack spacing={6} align="start" justify="space-between">
+            {/* Left side - Header Info */}
+            <Box>
+              <HStack mb={2}>
+                <Box
+                  bg="#FFEAA7"
+                  p={3}
+                  borderRadius="md"
+                  width="60px"
+                  height="60px"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  fontSize="32px"
+                >
+                  🔍
+                </Box>
+                <VStack align="start" spacing={1}>
+                  <Heading size="xl" color="white">
+                    Threat Intelligence
+                  </Heading>
+                  <Text color="#D5DBDB" fontSize="lg">
+                    CISA Known Exploitable Vulnerabilities
+                  </Text>
+                </VStack>
+              </HStack>
+              <Text color="#A0AEC0" fontSize="sm">
+                Find vetted threat indicators and guidance for proactive defense
               </Text>
-              <Button
-                size="sm"
-                variant="ghost"
-                color="#5294CF"
-                onClick={clearFilters}
-                _hover={{ bg: 'whiteAlpha.100' }}
-              >
-                Clear All
-              </Button>
-            </HStack>
+            </Box>
 
-            <VStack spacing={4} align="stretch">
-              {/* Search, Filter, and Toggle Row */}
+            {/* Right side - Filters */}
+            <VStack spacing={3} align="stretch" minW="400px" pt={2}>
               <HStack spacing={4} wrap="wrap" align="center">
                 <InputGroup w="180px" minW="150px">
                   <InputLeftElement>
@@ -350,6 +328,7 @@ export default function ThreatIntelligencePage() {
                     color="white"
                     _placeholder={{ color: 'gray.400' }}
                     _focus={{ borderColor: '#5294CF' }}
+                    size="sm"
                   />
                 </InputGroup>
 
@@ -364,40 +343,39 @@ export default function ThreatIntelligencePage() {
                   _focus={{ borderColor: '#5294CF' }}
                   w="180px"
                   minW="150px"
+                  size="sm"
                 />
-
-                <FormControl display="flex" alignItems="center" w="fit-content">
-                  <FormLabel htmlFor="ransomware-toggle" mb="0" color="gray.300" fontSize="sm" whiteSpace="nowrap">
-                    Known Ransomware
-                  </FormLabel>
-                  <Switch
-                    id="ransomware-toggle"
-                    isChecked={ransomwareToggle}
-                    onChange={(e) => setRansomwareToggle(e.target.checked)}
-                    colorScheme="blue"
-                    size="lg"
-                    w="60px"
-                    h="32px"
-                    sx={{
-                      '& .chakra-switch__track': {
-                        bg: ransomwareToggle ? '#3182CE' : '#4A5568',
-                        _checked: {
-                          bg: '#3182CE',
-                        },
-                      },
-                      '& .chakra-switch__thumb': {
-                        bg: 'white',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                        _checked: {
-                          transform: 'translateX(28px)',
-                        },
-                      },
-                    }}
-                  />
-                </FormControl>
               </HStack>
+
+              <FormControl display="flex" alignItems="center" w="fit-content">
+                <FormLabel htmlFor="ransomware-toggle" mb="0" color="gray.300" fontSize="sm" whiteSpace="nowrap">
+                  Known Ransomware
+                </FormLabel>
+                <Switch
+                  id="ransomware-toggle"
+                  isChecked={ransomwareToggle}
+                  onChange={(e) => setRansomwareToggle(e.target.checked)}
+                  colorScheme="blue"
+                  size="md"
+                  sx={{
+                    '& .chakra-switch__track': {
+                      bg: ransomwareToggle ? '#3182CE' : '#4A5568',
+                      _checked: {
+                        bg: '#3182CE',
+                      },
+                    },
+                    '& .chakra-switch__thumb': {
+                      bg: 'white',
+                      boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                      _checked: {
+                        transform: 'translateX(20px)',
+                      },
+                    },
+                  }}
+                />
+              </FormControl>
             </VStack>
-          </Box>
+          </HStack>
 
           {/* Results Summary */}
           <HStack justify="space-between" align="center">

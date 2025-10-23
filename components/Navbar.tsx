@@ -53,6 +53,42 @@ export default function Navbar() {
               Home
             </Box>
           </Link>
+          <Link href="/threat-intelligence" style={{ textDecoration: 'none' }}>
+            <Box
+              color="#D5DBDB"
+              fontSize="sm"
+              fontWeight="500"
+              cursor="pointer"
+              _hover={{ color: '#5294CF' }}
+              transition="color 0.2s"
+            >
+              Threat Intelligence
+            </Box>
+          </Link>
+      <Link href="/compliance" style={{ textDecoration: 'none' }}>
+        <Box
+          color="#D5DBDB"
+          fontSize="sm"
+          fontWeight="500"
+          cursor="pointer"
+          _hover={{ color: '#5294CF' }}
+          transition="color 0.2s"
+        >
+          Compliance
+        </Box>
+      </Link>
+      <Link href="/ai-security-frameworks" style={{ textDecoration: 'none' }}>
+        <Box
+          color="#D5DBDB"
+          fontSize="sm"
+          fontWeight="500"
+          cursor="pointer"
+          _hover={{ color: '#5294CF' }}
+          transition="color 0.2s"
+        >
+          AI Security
+        </Box>
+      </Link>
           <Link href="/oc-admin/login" style={{ textDecoration: 'none' }}>
             <Button
               size="sm"
@@ -89,6 +125,39 @@ export default function Navbar() {
                 _hover={{ color: '#5294CF' }}
               >
                 Home
+              </Box>
+            </Link>
+            <Link href="/threat-intelligence" style={{ textDecoration: 'none' }}>
+              <Box
+                color="#D5DBDB"
+                fontSize="sm"
+                fontWeight="500"
+                cursor="pointer"
+                _hover={{ color: '#5294CF' }}
+              >
+                Threat Intelligence
+              </Box>
+            </Link>
+            <Link href="/compliance" style={{ textDecoration: 'none' }}>
+              <Box
+                color="#D5DBDB"
+                fontSize="sm"
+                fontWeight="500"
+                cursor="pointer"
+                _hover={{ color: '#5294CF' }}
+              >
+                Compliance
+              </Box>
+            </Link>
+            <Link href="/ai-security-frameworks" style={{ textDecoration: 'none' }}>
+              <Box
+                color="#D5DBDB"
+                fontSize="sm"
+                fontWeight="500"
+                cursor="pointer"
+                _hover={{ color: '#5294CF' }}
+              >
+                AI Security
               </Box>
             </Link>
             <Link href="/oc-admin/login" style={{ textDecoration: 'none' }}>
