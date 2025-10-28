@@ -22,6 +22,9 @@ export default function AuthGuard({ children }: AuthGuardProps) {
 
   async function checkAuth() {
     try {
+      // Add a small delay to ensure Amplify is fully configured
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       const user = await getCurrentUser();
       const { signInDetails } = user;
       
@@ -33,6 +36,7 @@ export default function AuthGuard({ children }: AuthGuardProps) {
         router.push('/oc-admin/login');
       }
     } catch (error) {
+      console.error('Auth check error:', error);
       // Not authenticated - redirect to login
       router.push('/oc-admin/login');
     } finally {

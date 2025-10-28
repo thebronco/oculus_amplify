@@ -22,6 +22,7 @@ import AuthGuard from '@/components/admin/AuthGuard';
 import AdminLayout from '@/components/admin/AdminLayout';
 import LexicalEditor from '@/components/admin/LexicalEditor';
 import { getCategories, createArticle } from '@/lib/api';
+import { buildCategoryOptions } from '@/lib/categoryUtils';
 import type { Category } from '@/lib/types';
 
 function NewArticleForm() {
@@ -80,6 +81,7 @@ function NewArticleForm() {
   const handleChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -230,18 +232,7 @@ function NewArticleForm() {
                     color="white"
                     placeholder="Select a category"
                   >
-                    {categories
-                      .filter(c => c.parentId === 'root')
-                      .sort((a, b) => (a.order || 0) - (b.order || 0))
-                      .map((cat) => (
-                        <option
-                          key={cat.id}
-                          value={cat.id}
-                          style={{ background: '#161d26' }}
-                        >
-                          {cat.icon} {cat.name}
-                        </option>
-                      ))}
+                    {buildCategoryOptions(categories)}
                   </Select>
                 </FormControl>
 

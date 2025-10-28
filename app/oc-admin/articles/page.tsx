@@ -56,6 +56,18 @@ export default function ArticlesPage() {
     fetchData();
   }, []);
 
+  // Retry fetch if there's an auth error
+  useEffect(() => {
+    if (error && error.includes('No credentials available')) {
+      const retryTimer = setTimeout(() => {
+        console.log('Retrying data fetch after auth error...');
+        fetchData();
+      }, 2000);
+      
+      return () => clearTimeout(retryTimer);
+    }
+  }, [error]);
+
   useEffect(() => {
     filterArticles();
   }, [searchTerm, categoryFilter, statusFilter, articles]);
@@ -63,6 +75,7 @@ export default function ArticlesPage() {
   const fetchData = async () => {
     try {
       setLoading(true);
+      setError(''); // Clear any previous errors
       const [articlesData, categoriesData] = await Promise.all([
         getArticles(),
         getCategories(),
@@ -70,14 +83,19 @@ export default function ArticlesPage() {
       setArticles(articlesData);
       setCategories(categoriesData);
     } catch (err: any) {
+      console.error('Error fetching data:', err);
       setError(err.message || 'Failed to load data');
-      toast({
-        title: 'Error Loading Data',
-        description: err.message || 'Failed to load articles',
-        status: 'error',
-        duration: 5000,
-        isClosable: true,
-      });
+      
+      // Only show toast for non-auth errors
+      if (!err.message?.includes('No credentials available')) {
+        toast({
+          title: 'Error Loading Data',
+          description: err.message || 'Failed to load articles',
+          status: 'error',
+          duration: 5000,
+          isClosable: true,
+        });
+      }
     } finally {
       setLoading(false);
     }
