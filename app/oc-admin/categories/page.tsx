@@ -220,12 +220,29 @@ export default function CategoriesPage() {
     
     // Sort root categories and their children
     const sortCategories = (cats: CategoryWithChildren[]) => {
-      cats.sort((a, b) => (a.order || 0) - (b.order || 0));
-      cats.forEach(cat => {
+      // Separate visible and hidden categories
+      const visibleCategories = cats.filter(cat => cat.isVisible !== false);
+      const hiddenCategories = cats.filter(cat => cat.isVisible === false);
+      
+      // Sort visible categories by order
+      visibleCategories.sort((a, b) => (a.order || 0) - (b.order || 0));
+      
+      // Sort hidden categories by order (preserving their relative order)
+      hiddenCategories.sort((a, b) => (a.order || 0) - (b.order || 0));
+      
+      // Combine: visible first, then hidden
+      const sortedCats = [...visibleCategories, ...hiddenCategories];
+      
+      // Recursively sort children
+      sortedCats.forEach(cat => {
         if (cat.children && cat.children.length > 0) {
           sortCategories(cat.children);
         }
       });
+      
+      // Replace the original array with sorted categories
+      cats.length = 0;
+      cats.push(...sortedCats);
     };
     
     sortCategories(rootCategories);

@@ -34,7 +34,7 @@ function NewArticleForm() {
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
-    categoryId: searchParams.get('category') || '',
+    categoryId: '',
     content: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Start writing your article here...","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}',
     status: 'draft' as 'draft' | 'published',
     author: 'Admin',
@@ -44,6 +44,18 @@ function NewArticleForm() {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  // Update categoryId when categories are loaded and we have a category param
+  useEffect(() => {
+    const categoryParam = searchParams.get('category');
+    if (categoryParam && categories.length > 0) {
+      // Verify the category exists before setting it
+      const categoryExists = categories.find(cat => cat.id === categoryParam);
+      if (categoryExists && formData.categoryId !== categoryParam) {
+        setFormData(prev => ({ ...prev, categoryId: categoryParam }));
+      }
+    }
+  }, [categories, searchParams, formData.categoryId]);
 
   // Auto-generate slug from title
   useEffect(() => {
