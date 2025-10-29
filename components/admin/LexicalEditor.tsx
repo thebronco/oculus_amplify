@@ -153,11 +153,15 @@ export default function LexicalEditor({ initialContent = '', onChange }: Lexical
           text-decoration: line-through;
         }
         .editor-text-code {
-          background-color: rgba(255, 255, 255, 0.1);
+          background-color: rgba(0, 0, 0, 0.3);
           padding: 2px 6px;
           border-radius: 4px;
-          font-family: 'Courier New', monospace;
+          font-family: 'Courier New', 'Monaco', 'Consolas', monospace;
           font-size: 0.9em;
+          color: #68d391;
+          border: 1px solid rgba(104, 211, 145, 0.3);
+          white-space: pre-wrap;
+          word-break: break-word;
         }
         .editor-heading-h1 {
           font-size: 2em;
@@ -193,12 +197,16 @@ export default function LexicalEditor({ initialContent = '', onChange }: Lexical
           color: rgba(255, 255, 255, 0.8);
         }
         .editor-code {
-          background-color: rgba(255, 255, 255, 0.05);
+          background-color: rgba(0, 0, 0, 0.4);
           padding: 12px;
           border-radius: 6px;
-          font-family: 'Courier New', monospace;
+          font-family: 'Courier New', 'Monaco', 'Consolas', monospace;
           margin: 12px 0;
           overflow-x: auto;
+          white-space: pre;
+          color: #68d391;
+          border: 1px solid rgba(104, 211, 145, 0.3);
+          line-height: 1.6;
         }
         .editor-link {
           color: #5294CF;

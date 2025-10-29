@@ -19,6 +19,10 @@ import {
   HeadingTagType,
 } from '@lexical/rich-text';
 import {
+  $createCodeNode,
+  $isCodeNode,
+} from '@lexical/code';
+import {
   INSERT_ORDERED_LIST_COMMAND,
   INSERT_UNORDERED_LIST_COMMAND,
   REMOVE_LIST_COMMAND,
@@ -80,6 +84,8 @@ export default function ToolbarPlugin() {
           const parentList = $getNearestNodeOfType(anchorNode, ListNode);
           const type = parentList ? parentList.getTag() : element.getTag();
           setBlockType(type);
+        } else if ($isCodeNode(element)) {
+          setBlockType('code');
         } else {
           const type = $isHeadingNode(element)
             ? element.getTag()
@@ -128,6 +134,17 @@ export default function ToolbarPlugin() {
         const selection = $getSelection();
         if ($isRangeSelection(selection)) {
           $setBlocksType(selection, () => $createQuoteNode());
+        }
+      });
+    }
+  };
+
+  const formatCode = () => {
+    if (blockType !== 'code') {
+      editor.update(() => {
+        const selection = $getSelection();
+        if ($isRangeSelection(selection)) {
+          $setBlocksType(selection, () => $createCodeNode());
         }
       });
     }
@@ -198,6 +215,7 @@ export default function ToolbarPlugin() {
             else if (value === 'h2') formatHeading('h2');
             else if (value === 'h3') formatHeading('h3');
             else if (value === 'quote') formatQuote();
+            else if (value === 'code') formatCode();
           }}
           bg="whiteAlpha.100"
           color="white"
@@ -210,6 +228,7 @@ export default function ToolbarPlugin() {
           <option value="h2" style={{ background: '#161d26' }}>Heading 2</option>
           <option value="h3" style={{ background: '#161d26' }}>Heading 3</option>
           <option value="quote" style={{ background: '#161d26' }}>Quote</option>
+          <option value="code" style={{ background: '#161d26' }}>Code Block</option>
         </Select>
 
         <Divider orientation="vertical" height="24px" borderColor="whiteAlpha.300" />

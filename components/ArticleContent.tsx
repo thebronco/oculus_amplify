@@ -49,12 +49,35 @@ export default function ArticleContent({ content }: ArticleContentProps) {
       let fontWeight = 'normal';
       let fontStyle = 'normal';
       let textDecoration = 'none';
+      let isCode = false;
 
-      // Check for formatting (bold, italic, underline)
+      // Check for formatting (bold, italic, underline, code)
       if (node.format) {
         if (node.format & 1) fontWeight = 'bold'; // Bold
         if (node.format & 2) fontStyle = 'italic'; // Italic
+        if (node.format & 4) textDecoration = 'line-through'; // Strikethrough
         if (node.format & 8) textDecoration = 'underline'; // Underline
+        if (node.format & 16) isCode = true; // Inline code (bit 4)
+      }
+
+      // Render inline code differently
+      if (isCode) {
+        return (
+          <Code
+            key={index}
+            as="span"
+            color="green.300"
+            bg="gray.800"
+            px={2}
+            py={1}
+            borderRadius="md"
+            fontSize="0.9em"
+            fontFamily="mono"
+            whiteSpace="pre-wrap"
+          >
+            {textContent}
+          </Code>
+        );
       }
 
       return (
@@ -126,19 +149,53 @@ export default function ArticleContent({ content }: ArticleContentProps) {
 
     // Code block
     if (node.type === 'code') {
+      // Extract text content from code block children while preserving formatting
+      const extractCodeText = (nodes: LexicalNode[] | undefined): string => {
+        if (!nodes) return '';
+        return nodes.map((child, idx) => {
+          // Handle linebreak nodes
+          if (child.type === 'linebreak') {
+            return '\n';
+          }
+          // Handle text nodes
+          if (child.type === 'text' && child.text !== undefined) {
+            return child.text;
+          }
+          // Handle nested children
+          if (child.children) {
+            return extractCodeText(child.children);
+          }
+          return '';
+        }).join('');
+      };
+
+      const codeText = extractCodeText(node.children);
+      
+      // Don't render empty code blocks
+      if (!codeText || codeText.trim() === '') {
+        return null;
+      }
+      
       return (
-        <Code
+        <Box
           key={index}
+          as="pre"
           display="block"
           p={4}
           mb={4}
           bg="gray.800"
           color="green.300"
           borderRadius="md"
-          whiteSpace="pre-wrap"
+          whiteSpace="pre"
+          fontFamily="mono"
+          fontSize="0.9em"
+          lineHeight="1.6"
+          overflowX="auto"
+          border="1px solid"
+          borderColor="whiteAlpha.200"
         >
-          {node.children?.map((child, i) => renderNode(child, i))}
-        </Code>
+          <code>{codeText}</code>
+        </Box>
       );
     }
 
