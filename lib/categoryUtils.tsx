@@ -55,3 +55,4 @@ export const buildCategoryOptions = (categories: Category[]) => {
   
   return buildOptions(rootCategories);
 };
+
