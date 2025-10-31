@@ -19,7 +19,8 @@ export interface Article {
   title: string;
   slug: string;
   content: string; // Lexical JSON format
-  categoryId: string;
+  categoryId?: string; // Legacy: single category (for backward compatibility)
+  categoryIds?: string[]; // Array of category IDs
   status: 'published' | 'draft';
   author: string;
   attachments?: string; // JSON array

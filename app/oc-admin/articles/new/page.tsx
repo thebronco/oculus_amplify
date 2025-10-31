@@ -26,7 +26,7 @@ import AuthGuard from '@/components/admin/AuthGuard';
 import AdminLayout from '@/components/admin/AdminLayout';
 import LexicalEditor from '@/components/admin/LexicalEditor';
 import { getCategories, createArticle } from '@/lib/api';
-import { buildCategoryOptions } from '@/lib/categoryUtils';
+import { buildCategoryCheckboxes } from '@/lib/categoryUtils';
 import type { Category } from '@/lib/types';
 
 function NewArticleForm() {
@@ -40,7 +40,7 @@ function NewArticleForm() {
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
-    categoryId: '',
+    categoryIds: [] as string[],
     content: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"Start writing your article here...","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}',
     status: 'draft' as 'draft' | 'published',
     author: 'Admin',
@@ -59,17 +59,20 @@ function NewArticleForm() {
     fetchCategories();
   }, []);
 
-  // Update categoryId when categories are loaded and we have a category param
+  // Update categoryIds when categories are loaded and we have a category param
   useEffect(() => {
     const categoryParam = searchParams.get('category');
     if (categoryParam && categories.length > 0) {
       // Verify the category exists before setting it
       const categoryExists = categories.find(cat => cat.id === categoryParam);
-      if (categoryExists && formData.categoryId !== categoryParam) {
-        setFormData(prev => ({ ...prev, categoryId: categoryParam }));
+      if (categoryExists && !formData.categoryIds.includes(categoryParam)) {
+        setFormData(prev => ({ 
+          ...prev, 
+          categoryIds: [...prev.categoryIds, categoryParam] 
+        }));
       }
     }
-  }, [categories, searchParams, formData.categoryId]);
+  }, [categories, searchParams, formData.categoryIds]);
 
   // Auto-generate slug from title
   useEffect(() => {
@@ -104,10 +107,10 @@ function NewArticleForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title || !formData.categoryId) {
+    if (!formData.title || formData.categoryIds.length === 0) {
       toast({
         title: 'Missing Fields',
-        description: 'Please fill in title and select a category',
+        description: 'Please fill in title and select at least one category',
         status: 'warning',
         duration: 3000,
         isClosable: true,
@@ -257,20 +260,43 @@ function NewArticleForm() {
                   </FormHelperText>
                 </FormControl>
 
-                {/* Category */}
+                {/* Categories */}
                 <FormControl isRequired>
-                  <FormLabel color="white">Category</FormLabel>
-                  <Select
-                    value={formData.categoryId}
-                    onChange={(e) => handleChange('categoryId', e.target.value)}
-                    bg="whiteAlpha.100"
+                  <FormLabel color="white">Categories</FormLabel>
+                  <Box
+                    bg="whiteAlpha.50"
                     border="1px solid"
                     borderColor="whiteAlpha.300"
-                    color="white"
-                    placeholder="Select a category"
+                    borderRadius="md"
+                    p={4}
+                    maxH="300px"
+                    overflowY="auto"
                   >
-                    {buildCategoryOptions(categories)}
-                  </Select>
+                    {categories.length > 0 ? (
+                      buildCategoryCheckboxes(
+                        categories,
+                        formData.categoryIds,
+                        (categoryId, checked) => {
+                          if (checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              categoryIds: [...prev.categoryIds, categoryId]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              categoryIds: prev.categoryIds.filter(id => id !== categoryId)
+                            }));
+                          }
+                        }
+                      )
+                    ) : (
+                      <Text color="gray.400">Loading categories...</Text>
+                    )}
+                  </Box>
+                  <FormHelperText color="gray.500">
+                    Select one or more categories for this article
+                  </FormHelperText>
                 </FormControl>
 
                 {/* Author */}

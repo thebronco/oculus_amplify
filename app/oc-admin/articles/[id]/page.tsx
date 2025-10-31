@@ -22,7 +22,7 @@ import AuthGuard from '@/components/admin/AuthGuard';
 import AdminLayout from '@/components/admin/AdminLayout';
 import LexicalEditor from '@/components/admin/LexicalEditor';
 import { getCategories, getArticleById, updateArticle } from '@/lib/api';
-import { buildCategoryOptions } from '@/lib/categoryUtils';
+import { buildCategoryCheckboxes } from '@/lib/categoryUtils';
 import type { Category, Article } from '@/lib/types';
 
 function EditArticleForm() {
@@ -37,7 +37,7 @@ function EditArticleForm() {
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
-    categoryId: '',
+    categoryIds: [] as string[],
     content: '',
     status: 'draft' as 'draft' | 'published',
     author: 'Admin',
@@ -60,10 +60,13 @@ function EditArticleForm() {
         throw new Error('Article not found');
       }
 
+      // Handle backward compatibility: if article has categoryId but no categoryIds, convert it
+      const categoryIds = article.categoryIds || (article.categoryId ? [article.categoryId] : []);
+      
       setFormData({
         title: article.title,
         slug: article.slug,
-        categoryId: article.categoryId,
+        categoryIds: categoryIds,
         content: article.content,
         status: article.status,
         author: article.author,
@@ -93,10 +96,10 @@ function EditArticleForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.title || !formData.categoryId) {
+    if (!formData.title || formData.categoryIds.length === 0) {
       toast({
         title: 'Missing Fields',
-        description: 'Please fill in title and select a category',
+        description: 'Please fill in title and select at least one category',
         status: 'warning',
         duration: 3000,
         isClosable: true,
@@ -198,20 +201,43 @@ function EditArticleForm() {
                   </FormHelperText>
                 </FormControl>
 
-                {/* Category */}
+                {/* Categories */}
                 <FormControl isRequired>
-                  <FormLabel color="white">Category</FormLabel>
-                  <Select
-                    value={formData.categoryId}
-                    onChange={(e) => handleChange('categoryId', e.target.value)}
-                    bg="whiteAlpha.100"
+                  <FormLabel color="white">Categories</FormLabel>
+                  <Box
+                    bg="whiteAlpha.50"
                     border="1px solid"
                     borderColor="whiteAlpha.300"
-                    color="white"
-                    placeholder="Select a category"
+                    borderRadius="md"
+                    p={4}
+                    maxH="300px"
+                    overflowY="auto"
                   >
-                    {buildCategoryOptions(categories)}
-                  </Select>
+                    {categories.length > 0 ? (
+                      buildCategoryCheckboxes(
+                        categories,
+                        formData.categoryIds,
+                        (categoryId, checked) => {
+                          if (checked) {
+                            setFormData(prev => ({
+                              ...prev,
+                              categoryIds: [...prev.categoryIds, categoryId]
+                            }));
+                          } else {
+                            setFormData(prev => ({
+                              ...prev,
+                              categoryIds: prev.categoryIds.filter(id => id !== categoryId)
+                            }));
+                          }
+                        }
+                      )
+                    ) : (
+                      <Text color="gray.400">Loading categories...</Text>
+                    )}
+                  </Box>
+                  <FormHelperText color="gray.500">
+                    Select one or more categories for this article
+                  </FormHelperText>
                 </FormControl>
 
                 {/* Author */}

@@ -115,9 +115,16 @@ export default function ArticlesPage() {
       );
     }
 
-    // Category filter
+    // Category filter - handle both categoryIds (array) and categoryId (legacy)
     if (categoryFilter !== 'all') {
-      filtered = filtered.filter((article) => article.categoryId === categoryFilter);
+      filtered = filtered.filter((article) => {
+        // Check if article has categoryIds array
+        if (article.categoryIds && Array.isArray(article.categoryIds)) {
+          return article.categoryIds.includes(categoryFilter);
+        }
+        // Fallback to legacy categoryId for backward compatibility
+        return article.categoryId === categoryFilter;
+      });
     }
 
     // Status filter
@@ -164,9 +171,23 @@ export default function ArticlesPage() {
     onOpen();
   };
 
-  const getCategoryName = (categoryId: string) => {
-    const cat = categories.find((c) => c.id === categoryId);
-    return cat ? `${cat.icon} ${cat.name}` : 'Unknown';
+  const getCategoryNames = (article: Article) => {
+    // Handle both categoryIds (array) and categoryId (legacy)
+    let categoryIds: string[] = [];
+    if (article.categoryIds && Array.isArray(article.categoryIds)) {
+      categoryIds = article.categoryIds;
+    } else if (article.categoryId) {
+      categoryIds = [article.categoryId];
+    }
+    
+    const categoryNames = categoryIds
+      .map(id => {
+        const cat = categories.find((c) => c.id === id);
+        return cat ? `${cat.icon} ${cat.name}` : null;
+      })
+      .filter(Boolean) as string[];
+    
+    return categoryNames.length > 0 ? categoryNames.join(', ') : 'Unknown';
   };
 
   const formatDate = (dateString: string) => {
@@ -320,7 +341,7 @@ export default function ArticlesPage() {
                         </Td>
                         <Td>
                           <Badge colorScheme="purple" variant="subtle">
-                            {getCategoryName(article.categoryId)}
+                            {getCategoryNames(article)}
                           </Badge>
                         </Td>
                         <Td color="gray.400" fontSize="sm">
@@ -347,7 +368,9 @@ export default function ArticlesPage() {
                               colorScheme="green"
                               variant="ghost"
                               onClick={() => {
-                                const category = categories.find(c => c.id === article.categoryId);
+                                // Use first category for URL navigation (for backward compatibility)
+                                const categoryId = article.categoryIds?.[0] || article.categoryId;
+                                const category = categories.find(c => c.id === categoryId);
                                 if (category) {
                                   router.push(`/${category.slug}/${article.slug}`);
                                 }

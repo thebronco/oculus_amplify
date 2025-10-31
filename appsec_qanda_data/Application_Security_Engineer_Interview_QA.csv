@@ -1,0 +1,51 @@
+Question,Answer
+How does SAST work and how does it differ from DAST?,"SAST analyzes source code or binaries without executing them, detecting security flaws early. DAST tests running apps dynamically for exploitable issues in real time."
+How do you integrate Checkmarx SAST into a GitLab or GitHub pipeline?,"By using Checkmarx CLI or plugins in CI jobs, authenticating via API tokens, and triggering scans on pull requests or merges with severity thresholds to fail builds."
+"What is incremental scanning in Checkmarx, and when do you use it?","Incremental scanning analyzes only changed code since the last scan, making it ideal for PR-level checks to reduce scan time in active pipelines."
+How do you reduce false positives in SAST results?,"Customize rules, tune engine filters, verify data flows manually, and suppress verified false positives through audit workflows or whitelisting."
+What are best practices for managing SAST rules and queries?,"Version-control custom queries, align them with secure coding standards, and review quarterly to remove obsolete or redundant rules."
+How do you handle scanning large monorepos efficiently?,"Break scans by module, use incremental scans, cache results, and parallelize pipelines to avoid full-repo bottlenecks."
+Describe a real case where you cleared a backlog of 10K+ SAST findings.,"I grouped findings by CWE and severity, automated triage with Checkmarx APIs, and trained devs on top recurring issues — cutting criticals by 85% in 3 months."
+How do you differentiate between a real SQL Injection and a false pattern?,A real risk involves user input concatenated directly into SQL; safe code uses parameterized queries or ORM layers that sanitize data.
+When would you exclude a vulnerability type from scans?,"When it’s irrelevant to your tech stack (e.g., XML Injection in a non-XML app) or consistently triggers false positives after validation."
+How do you handle third-party SDKs that trigger findings?,"Validate exploitability; if unfixable, apply compensating controls like sandboxing, WAF filters, or package-level suppressions."
+"What is SCA, and how is it different from SAST?","SCA scans open-source dependencies for known CVEs and license issues, while SAST analyzes your proprietary code for logic vulnerabilities."
+How do you integrate Nexus IQ with GitHub Actions or GitLab CI?,"Run the Nexus IQ CLI or plugin post-build to scan dependencies, upload results to IQ Server, and enforce policy thresholds automatically."
+How do you determine if a critical CVE from SCA is actually exploitable?,"Check runtime reachability, if the vulnerable function is called, and whether the component is loaded in production builds."
+How do you prioritize open-source vulnerabilities?,"Prioritize by exploitability, runtime use, and business impact — not just CVSS score — to focus on real-world risk."
+How do you automate license policy enforcement?,Define allow/deny license lists in Nexus IQ or similar tools and fail builds automatically when non-compliant licenses appear.
+What’s your approach when upgrading a vulnerable library breaks dependencies?,"Test upgrades in isolation, coordinate fixes with dev teams, or apply temporary compensating controls until full remediation."
+How can you safely ignore or suppress false positives in SCA?,Use time-limited suppression records tied to package versions and document rationale in audit logs for accountability.
+"How do you handle dynamically pulled dependencies (npm, pip, Maven)?","Use lock files and container image scanning to ensure only approved, version-pinned dependencies are included."
+What are common pitfalls of SCA scans in CI/CD?,"Scanning too late in the build process, missing transitive dependencies, or ignoring environment-specific components."
+How do you measure and report SCA progress?,"Use dashboards tracking open vs. fixed CVEs, mean time to remediate (MTTR), and compliance against defined SLAs."
+"What’s the difference between SAST, DAST, and IAST?","SAST is static code analysis, DAST tests running apps externally, and IAST combines both during runtime for deeper context."
+How do you automate OWASP ZAP or Burp Suite scans in GitLab?,"Run containerized scans in CI jobs with predefined targets, authentication scripts, and export reports to artifacts or dashboards."
+What are authentication challenges in automated DAST?,"Handling session expiration, MFA, and dynamic tokens — solved by using pre-authenticated cookies or API-based login scripts."
+"How do you manage overlapping findings between DAST, SAST, and SCA?","Correlate via CWE ID or component path, deduplicate results, and keep a unified vulnerability record per asset."
+How would you verify if a DAST-reported XSS is exploitable?,"Test payloads manually; if encoding, sanitization, or CSP prevents script execution, it’s a false positive."
+How do you perform API security testing in CI/CD?,Integrate API scanners like ZAP or Postman scripts using Swagger definitions to automate endpoint testing.
+What’s your approach to securing microservices or REST APIs?,"Implement strong auth (OAuth2, JWT), least-privilege scopes, input validation, and consistent security middleware."
+How do you handle rate limiting and session issues during DAST?,"Throttle scanner requests, increase timeout thresholds, and use authenticated sessions to maintain consistency."
+How do you correlate DAST results with logs to confirm impact?,"Match timestamps, request IDs, or correlation IDs from DAST payloads against server access logs for verification."
+What are OWASP API Top 10 vulnerabilities?,"They include Broken Object Level Authorization, Excessive Data Exposure, and Mass Assignment — focused specifically on API misuse versus general web flaws."
+How would you build a “Security Gate” in CI/CD?,"Define pipeline rules that block merges when critical vulnerabilities exceed thresholds, enforcing fix-before-release."
+What’s your GitLab YAML flow for SAST + SCA + DAST?,"Sequential jobs: SAST → SCA → DAST; each job exports artifacts, with rules for merge requests and nightly runs."
+How do you manage secrets scanning alongside SAST?,Run tools like TruffleHog or GitLeaks in parallel CI stages and fail builds if credentials are detected.
+How do you ensure pull-request scans are fast and relevant?,Use incremental or diff-based SAST scans limited to changed files and critical directories.
+When do you run full-repo scans vs. PR-level scans?,Full scans during nightly or pre-release builds; incremental scans on PRs for developer feedback loops.
+How do you handle scan failures blocking builds?,"Use soft fails for initial rollout, provide metrics, and gradually enforce hard gates as teams mature."
+How do you store and track scan results long term?,"Archive reports as artifacts, push metrics to dashboards, and integrate results into JIRA or SIEM systems."
+What’s the role of policy-as-code in vulnerability management?,"OPA or Sentinel enforce consistent rules (e.g., no criticals allowed) as machine-readable policies in pipelines."
+How do you integrate Checkmarx and Nexus IQ with JIRA or ServiceNow?,"Use built-in connectors or REST APIs to auto-create, assign, and close tickets based on scan results."
+How do you provide developer feedback for fixes?,"Enable Checkmarx IDE plugins, use GitHub code annotations, and share remediation guidance inline with findings."
+What are the OWASP Top 10 (2021)?,"Broken Access Control, Cryptographic Failures, Injection, Insecure Design, Security Misconfiguration, Vulnerable Components, Auth Failures, Integrity Failures, Logging Failures, and SSRF."
+How do you detect and prevent Reflected vs. Stored XSS?,"Reflected occurs in immediate responses; Stored persists in data. Prevent with input validation, output encoding, and CSP headers."
+How do you prevent SQL Injection in Java or Python apps?,"Use parameterized queries, ORM frameworks, and input sanitization — never concatenate user input directly."
+Explain Insecure Deserialization and how to test for it.,It occurs when untrusted serialized data is processed; test via tampered payloads and fix by restricting or signing serialized objects.
+What is SSRF and why is it dangerous in cloud setups?,"SSRF forces servers to make internal requests; in cloud, it can expose metadata or private endpoints. Mitigate with allowlists and network egress controls."
+How do you mitigate Broken Access Control in APIs?,"Enforce authorization checks per endpoint, validate tokens, and use consistent role-based or attribute-based access control."
+What’s the difference between Security Misconfiguration and Vulnerable Components?,Misconfigurations are insecure defaults or open settings; vulnerable components are outdated or flawed dependencies.
+What’s your strategy for CORS security?,"Restrict allowed origins, headers, and methods; avoid wildcards and dynamically validate trusted domains."
+Describe a major security challenge you overcame.,"A legacy system couldn’t be patched; I applied WAF virtual patches, segmented the network, and phased out high-risk modules under a risk-acceptance plan."
+What are your best practices for vulnerability management?,"Automate discovery, triage by exploitability, track via JIRA SLAs, and measure MTTR to drive continuous improvement."
