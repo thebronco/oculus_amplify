@@ -17,7 +17,11 @@ import {
   Text,
   useToast,
   Spinner,
+  InputGroup,
+  InputRightElement,
+  IconButton,
 } from '@chakra-ui/react';
+import { RepeatIcon } from '@chakra-ui/icons';
 import AuthGuard from '@/components/admin/AuthGuard';
 import AdminLayout from '@/components/admin/AdminLayout';
 import LexicalEditor from '@/components/admin/LexicalEditor';
@@ -32,6 +36,7 @@ function NewArticleForm() {
   
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
   const [formData, setFormData] = useState({
     title: '',
     slug: '',
@@ -41,6 +46,14 @@ function NewArticleForm() {
     author: 'Admin',
     attachments: '',
   });
+
+  // Helper function to generate slug from title
+  const generateSlug = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+  };
 
   useEffect(() => {
     fetchCategories();
@@ -60,14 +73,11 @@ function NewArticleForm() {
 
   // Auto-generate slug from title
   useEffect(() => {
-    if (formData.title && !formData.slug) {
-      const slug = formData.title
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '');
+    if (formData.title && !slugManuallyEdited) {
+      const slug = generateSlug(formData.title);
       setFormData((prev) => ({ ...prev, slug }));
     }
-  }, [formData.title, formData.slug]);
+  }, [formData.title, slugManuallyEdited]);
 
   const fetchCategories = async () => {
     try {
@@ -80,6 +90,14 @@ function NewArticleForm() {
 
   const handleChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleRegenerateSlug = () => {
+    if (formData.title) {
+      const slug = generateSlug(formData.title);
+      setFormData((prev) => ({ ...prev, slug }));
+      setSlugManuallyEdited(false);
+    }
   };
 
 
@@ -204,19 +222,38 @@ function NewArticleForm() {
                 {/* Slug */}
                 <FormControl isRequired>
                   <FormLabel color="white">URL Slug</FormLabel>
-                  <Input
-                    value={formData.slug}
-                    onChange={(e) => handleChange('slug', e.target.value)}
-                    placeholder="e.g., how-to-configure-iptables"
-                    bg="whiteAlpha.100"
-                    border="1px solid"
-                    borderColor="whiteAlpha.300"
-                    color="white"
-                    _placeholder={{ color: 'gray.500' }}
-                    fontFamily="mono"
-                  />
+                  <InputGroup>
+                    <Input
+                      value={formData.slug}
+                      onChange={(e) => {
+                        setSlugManuallyEdited(true);
+                        handleChange('slug', e.target.value);
+                      }}
+                      placeholder="e.g., how-to-configure-iptables"
+                      bg="whiteAlpha.100"
+                      border="1px solid"
+                      borderColor="whiteAlpha.300"
+                      color="white"
+                      _placeholder={{ color: 'gray.500' }}
+                      fontFamily="mono"
+                      pr="50px"
+                    />
+                    <InputRightElement width="50px">
+                      <IconButton
+                        aria-label="Regenerate slug"
+                        icon={<RepeatIcon />}
+                        size="sm"
+                        variant="ghost"
+                        color="gray.400"
+                        _hover={{ color: 'white', bg: 'whiteAlpha.200' }}
+                        onClick={handleRegenerateSlug}
+                        isDisabled={!formData.title}
+                        title="Regenerate slug from title"
+                      />
+                    </InputRightElement>
+                  </InputGroup>
                   <FormHelperText color="gray.500">
-                    Used in URLs. Auto-generated from title.
+                    Used in URLs. Auto-generated from title. Click the refresh icon to regenerate.
                   </FormHelperText>
                 </FormControl>
 

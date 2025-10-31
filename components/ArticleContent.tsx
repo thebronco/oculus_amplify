@@ -152,21 +152,44 @@ export default function ArticleContent({ content }: ArticleContentProps) {
       // Extract text content from code block children while preserving formatting
       const extractCodeText = (nodes: LexicalNode[] | undefined): string => {
         if (!nodes) return '';
-        return nodes.map((child, idx) => {
+        const parts: string[] = [];
+        
+        nodes.forEach((child, idx) => {
           // Handle linebreak nodes
           if (child.type === 'linebreak') {
-            return '\n';
+            parts.push('\n');
+            return;
           }
-          // Handle text nodes
+          
+          // Handle paragraph nodes - treat as newlines in code blocks
+          if (child.type === 'paragraph') {
+            if (child.children && child.children.length > 0) {
+              const paragraphText = extractCodeText(child.children);
+              parts.push(paragraphText);
+            } else {
+              parts.push('');
+            }
+            // Add newline after paragraph (except for last one)
+            if (idx < nodes.length - 1) {
+              parts.push('\n');
+            }
+            return;
+          }
+          
+          // Handle text nodes directly
           if (child.type === 'text' && child.text !== undefined) {
-            return child.text;
+            parts.push(child.text);
+            return;
           }
-          // Handle nested children
-          if (child.children) {
-            return extractCodeText(child.children);
+          
+          // Handle nested children (for other node types)
+          if (child.children && child.children.length > 0) {
+            const nestedText = extractCodeText(child.children);
+            parts.push(nestedText);
           }
-          return '';
-        }).join('');
+        });
+        
+        return parts.join('');
       };
 
       const codeText = extractCodeText(node.children);
@@ -193,8 +216,9 @@ export default function ArticleContent({ content }: ArticleContentProps) {
           overflowX="auto"
           border="1px solid"
           borderColor="whiteAlpha.200"
+          style={{ whiteSpace: 'pre' }}
         >
-          <code>{codeText}</code>
+          <code style={{ whiteSpace: 'pre', display: 'block', margin: 0, padding: 0 }}>{codeText}</code>
         </Box>
       );
     }
