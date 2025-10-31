@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Amplify } from 'aws-amplify';
 import outputs from '@/amplify_outputs.json';
 import Navbar from '@/components/Navbar';
+import SearchBox from '@/components/SearchBox';
 import Link from 'next/link';
 import { getCategories, type Category } from '@/lib/dynamodb';
 import { 
@@ -59,6 +60,11 @@ export default function HomePage() {
         <Flex gap={{ base: 4, md: 8 }} maxW="1400px" mx="auto" direction={{ base: 'column', lg: 'row' }}>
           {/* Main Content Area - 70% */}
           <Box flex="3">
+            {/* Search Box */}
+            <Box mb={6}>
+              <SearchBox />
+            </Box>
+            
             <Box 
               bg="rgba(255,255,255,0.05)" 
               borderRadius="lg" 
