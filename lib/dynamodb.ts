@@ -1,6 +1,7 @@
 import { DynamoDBClient } from '@aws-sdk/client-dynamodb';
 import { DynamoDBDocumentClient, ScanCommand, QueryCommand } from '@aws-sdk/lib-dynamodb';
 import { fetchAuthSession } from 'aws-amplify/auth';
+import type { Article, Category } from './types';
 
 // Table names for existing DynamoDB tables
 export const TABLES = {
@@ -35,34 +36,8 @@ async function getDynamoDBClient() {
   }
 }
 
-// Category type definition
-export interface Category {
-  id: string;
-  name: string;
-  slug: string;
-  description?: string;
-  icon?: string;
-  color?: string;
-  parentId: string;
-  order?: number;
-  isVisible?: boolean;
-  createdAt?: string;
-  updatedAt?: string;
-}
-
-// Article type definition
-export interface Article {
-  id: string;
-  title: string;
-  slug: string;
-  content: string;
-  categoryId: string;
-  status: string;
-  author: string;
-  attachments?: string;
-  createdAt?: string;
-  updatedAt?: string;
-}
+// Re-export types for convenience
+export type { Article, Category } from './types';
 
 // Fetch all categories from existing table
 export async function getCategories(): Promise<Category[]> {
