@@ -237,22 +237,29 @@ export async function updateArticle(id: string, data: Partial<Article>): Promise
     const client = await getDynamoDBClient();
     const now = new Date().toISOString();
 
-    // Build update expression
+    // Build update expression - only include defined values
     const updateExpressions: string[] = [];
     const expressionAttributeNames: Record<string, string> = {};
     const expressionAttributeValues: Record<string, any> = {};
 
     Object.entries(data).forEach(([key, value]) => {
-      if (key !== 'id' && key !== 'createdAt') {
+      if (key !== 'id' && key !== 'createdAt' && value !== undefined && value !== null) {
         updateExpressions.push(`#${key} = :${key}`);
         expressionAttributeNames[`#${key}`] = key;
         expressionAttributeValues[`:${key}`] = value;
       }
     });
 
+    // Ensure we have at least the updatedAt field
     updateExpressions.push(`#updatedAt = :updatedAt`);
     expressionAttributeNames['#updatedAt'] = 'updatedAt';
     expressionAttributeValues[':updatedAt'] = now;
+
+    // Validate that we have something to update
+    if (updateExpressions.length === 1) {
+      // Only updatedAt - this means no actual data changes
+      console.warn('No data to update for article:', id);
+    }
 
     const { UpdateCommand } = await getDynamoDBCommands();
     const command = new UpdateCommand({
@@ -264,11 +271,25 @@ export async function updateArticle(id: string, data: Partial<Article>): Promise
       ReturnValues: 'ALL_NEW',
     });
 
+    console.log('Updating article:', id, 'with data:', data);
     const response = await client.send(command);
+    
+    if (!response.Attributes) {
+      throw new Error('Update succeeded but no attributes returned');
+    }
+    
+    console.log('Article updated successfully:', response.Attributes);
     return response.Attributes as Article;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error updating article:', error);
-    throw error;
+    console.error('Article ID:', id);
+    console.error('Update data:', data);
+    
+    // Provide more detailed error message
+    const errorMessage = error?.message || 'Unknown error occurred while updating article';
+    const errorDetails = error?.name || error?.code || 'Unknown error type';
+    
+    throw new Error(`${errorMessage} (${errorDetails})`);
   }
 }
 

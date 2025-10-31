@@ -109,7 +109,14 @@ function EditArticleForm() {
 
     setSaving(true);
     try {
-      await updateArticle(articleId, formData);
+      console.log('Submitting article update:', {
+        articleId,
+        formData,
+      });
+
+      const updatedArticle = await updateArticle(articleId, formData);
+
+      console.log('Article update response:', updatedArticle);
 
       toast({
         title: 'Article Updated!',
@@ -119,13 +126,24 @@ function EditArticleForm() {
         isClosable: true,
       });
 
-      router.push('/oc-admin/articles');
+      // Small delay before redirect to ensure toast is visible
+      setTimeout(() => {
+        router.push('/oc-admin/articles');
+      }, 500);
     } catch (error: any) {
+      console.error('Error in handleSubmit:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        name: error?.name,
+        code: error?.code,
+        stack: error?.stack,
+      });
+      
       toast({
         title: 'Failed to Update Article',
-        description: error.message,
+        description: error?.message || 'An unexpected error occurred. Please check the browser console for details.',
         status: 'error',
-        duration: 5000,
+        duration: 8000,
         isClosable: true,
       });
     } finally {
