@@ -12,7 +12,7 @@ import { HeadingNode, QuoteNode } from '@lexical/rich-text';
 import { ListItemNode, ListNode } from '@lexical/list';
 import { CodeNode } from '@lexical/code';
 import { LinkNode } from '@lexical/link';
-import { $getRoot, $createParagraphNode, $createTextNode, EditorState } from 'lexical';
+import { $getRoot, $createParagraphNode, $createTextNode, EditorState, $createLineBreakNode } from 'lexical';
 import { Box } from '@chakra-ui/react';
 import ToolbarPlugin from './ToolbarPlugin';
 
@@ -203,10 +203,25 @@ export default function LexicalEditor({ initialContent = '', onChange }: Lexical
           font-family: 'Courier New', 'Monaco', 'Consolas', monospace;
           margin: 12px 0;
           overflow-x: auto;
-          white-space: pre;
+          white-space: pre !important;
           color: #68d391;
           border: 1px solid rgba(104, 211, 145, 0.3);
           line-height: 1.6;
+          display: block;
+          min-height: 60px;
+        }
+        .editor-code * {
+          white-space: pre !important;
+        }
+        .editor-code code {
+          white-space: pre !important;
+          display: block;
+          width: 100%;
+        }
+        .editor-code pre {
+          white-space: pre !important;
+          margin: 0;
+          padding: 0;
         }
         .editor-link {
           color: #5294CF;

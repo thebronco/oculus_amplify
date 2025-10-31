@@ -175,7 +175,11 @@ export default function ToolbarPlugin() {
       p={2}
       borderBottom="1px solid"
       borderColor="whiteAlpha.300"
-      bg="whiteAlpha.50"
+      position="sticky"
+      top={0}
+      zIndex={10}
+      backdropFilter="blur(10px)"
+      bg="rgba(22, 29, 38, 0.95)"
     >
       <HStack spacing={2} flexWrap="wrap">
         {/* Undo/Redo */}
