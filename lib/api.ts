@@ -218,6 +218,14 @@ export async function createArticle(data: Omit<Article, 'id' | 'createdAt' | 'up
       updatedAt: now,
     };
 
+    console.log('Creating article with data:', {
+      id,
+      title: article.title,
+      slug: article.slug,
+      categoryIds: article.categoryIds,
+      status: article.status,
+    });
+
     const { PutCommand } = await getDynamoDBCommands();
     const command = new PutCommand({
       TableName: TABLES.ARTICLES,
@@ -225,10 +233,18 @@ export async function createArticle(data: Omit<Article, 'id' | 'createdAt' | 'up
     });
 
     await client.send(command);
+    
+    console.log('Article created successfully:', id);
     return article;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error creating article:', error);
-    throw error;
+    console.error('Article data:', data);
+    
+    // Provide more detailed error message
+    const errorMessage = error?.message || 'Unknown error occurred while creating article';
+    const errorDetails = error?.name || error?.code || 'Unknown error type';
+    
+    throw new Error(`${errorMessage} (${errorDetails})`);
   }
 }
 

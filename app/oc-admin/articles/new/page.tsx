@@ -106,6 +106,9 @@ function NewArticleForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    
+    console.log('Form submitted, current formData:', formData);
     
     if (!formData.title || formData.categoryIds.length === 0) {
       toast({
@@ -118,8 +121,30 @@ function NewArticleForm() {
       return;
     }
 
+    if (!formData.slug || formData.slug.trim() === '') {
+      toast({
+        title: 'Missing Slug',
+        description: 'Please provide a URL slug for the article',
+        status: 'warning',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
     setLoading(true);
     try {
+      console.log('Submitting article creation:', {
+        formData: {
+          title: formData.title,
+          slug: formData.slug,
+          categoryIds: formData.categoryIds,
+          status: formData.status,
+          author: formData.author,
+          contentLength: formData.content?.length || 0,
+        },
+      });
+
       // Convert simple text content to Lexical JSON if needed
       let contentToSave = formData.content;
       
@@ -159,10 +184,12 @@ function NewArticleForm() {
         contentToSave = JSON.stringify(lexicalContent);
       }
 
-      await createArticle({
+      const createdArticle = await createArticle({
         ...formData,
         content: contentToSave,
       });
+
+      console.log('Article creation response:', createdArticle);
 
       toast({
         title: 'Article Created!',
@@ -172,13 +199,24 @@ function NewArticleForm() {
         isClosable: true,
       });
 
-      router.push('/oc-admin/articles');
+      // Small delay before redirect to ensure toast is visible
+      setTimeout(() => {
+        router.push('/oc-admin/articles');
+      }, 500);
     } catch (error: any) {
+      console.error('Error in handleSubmit:', error);
+      console.error('Error details:', {
+        message: error?.message,
+        name: error?.name,
+        code: error?.code,
+        stack: error?.stack,
+      });
+      
       toast({
         title: 'Failed to Create Article',
-        description: error.message,
+        description: error?.message || 'An unexpected error occurred. Please check the browser console for details.',
         status: 'error',
-        duration: 5000,
+        duration: 8000,
         isClosable: true,
       });
     } finally {
@@ -358,6 +396,14 @@ function NewArticleForm() {
                     loadingText="Creating..."
                     size="lg"
                     flex={1}
+                    onClick={(e) => {
+                      // Ensure form submission is handled correctly
+                      const form = e.currentTarget.closest('form');
+                      if (form && !form.checkValidity()) {
+                        e.preventDefault();
+                        form.reportValidity();
+                      }
+                    }}
                   >
                     Create Article
                   </Button>
