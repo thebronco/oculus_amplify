@@ -30,6 +30,8 @@ import { buildCategoryCheckboxes } from '@/lib/categoryUtils';
 import type { Category } from '@/lib/types';
 
 function NewArticleForm() {
+  console.log('=== NewArticleForm Component Rendered ===');
+  
   const router = useRouter();
   const searchParams = useSearchParams();
   const toast = useToast();
@@ -105,10 +107,13 @@ function NewArticleForm() {
 
 
   const handleSubmit = async (e: React.FormEvent) => {
+    console.log('=== handleSubmit CALLED ===');
+    console.log('Event:', e);
+    console.log('Event type:', e.type);
+    console.log('Current formData:', formData);
+    
     e.preventDefault();
     e.stopPropagation();
-    
-    console.log('Form submitted, current formData:', formData);
     
     if (!formData.title || formData.categoryIds.length === 0) {
       toast({
@@ -242,7 +247,20 @@ function NewArticleForm() {
             borderRadius="lg"
             p={6}
           >
-            <form onSubmit={handleSubmit}>
+            <form 
+              onSubmit={(e) => {
+                console.log('=== FORM onSubmit EVENT FIRED ===');
+                console.log('Event target:', e.target);
+                console.log('Event currentTarget:', e.currentTarget);
+                handleSubmit(e);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
+                  e.preventDefault();
+                }
+              }}
+              noValidate
+            >
               <VStack spacing={6} align="stretch">
                 {/* Title */}
                 <FormControl isRequired>
@@ -396,14 +414,6 @@ function NewArticleForm() {
                     loadingText="Creating..."
                     size="lg"
                     flex={1}
-                    onClick={(e) => {
-                      // Ensure form submission is handled correctly
-                      const form = e.currentTarget.closest('form');
-                      if (form && !form.checkValidity()) {
-                        e.preventDefault();
-                        form.reportValidity();
-                      }
-                    }}
                   >
                     Create Article
                   </Button>
